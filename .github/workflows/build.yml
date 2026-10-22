@@ -1,0 +1,28 @@
+name: Build
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Get AML headers
+        run: |
+          git clone --depth 1 https://github.com/RusJJ/AndroidModLoader aml
+          mkdir -p mod
+          cp -r aml/mod/* mod/
+          ls mod
+
+      - name: Build
+        run: |
+          $ANDROID_NDK_LATEST_HOME/ndk-build NDK_PROJECT_PATH=. APP_BUILD_SCRIPT=jni/Android.mk NDK_APPLICATION_MK=jni/Application.mk
+
+      - name: Upload .so
+        uses: actions/upload-artifact@v4
+        with:
+          name: JoltRagdollAndroid
+          path: libs/armeabi-v7a/libJoltRagdollAndroid.so
